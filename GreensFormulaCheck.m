@@ -1,8 +1,8 @@
 %Checking Green's Formula:
 
-%The known harmonic function
+%The known harmonic function 
 u = @(x,y) 4*(x.^2 - y.^2) + 8*x.*y;
-ugrad = @(x,y) [8*x + 8*y, 8*x-8*y];
+ugrad = @(x,y) [8*x + 8*y; 8*x-8*y];
 
 %The general solution to Laplace's equation , x,y E R2
 I = @(x,y) 1/(2*pi)*log(1./sqrt(sum((x-y).^2)));
@@ -15,31 +15,30 @@ G = curveCircle(3,N);
 
 %target point
 
-tx = [-4.0:0.2:4.0];
-ty = [-4.0:0.2:4.0];
+tx = [-3.0:0.2:3.0]; %only within the region 
+ty = [-3.0:0.2:3.0];
 t = [tx;ty]; 
 
-x = [1.5, 1.1];  %inside the region R 
+%TO DO- get target points over a whole grid!!
+%[xx,yy] = meshgrid(-3:0.2:3.0);
+%t = xx;
 
-result = 0;
+x = [1.5; 1.1];  %inside the region R 
+res = 0*length(t);
 
-%%
-%integrate over source points
-for i=1:1:length(G.s)
-
-    s_x = G.X(1,i);
-    s_y = G.X(2,i);
-
-   if(and(s_x == x(1),s_y == x(2)))
-       integrand = -G.cur(x)/(4*pi)*wt(i)*G.spd(i);
-   else
-    dUdn = dot(G.n(:,i), ugrad(s_x,s_y)); 
-    dIdn = dot(G.n(:,i), Igrad(x, G.X(:,i)'));
-    integrand = (dUdn*I(x,G.X(:,i)') - u(G.X(1,i),G.X(2,i))*dIdn)*G.wts(i)*G.spd(i); 
-   
-   end
-   result = result + integrand;
+for j=1:1:length(t)
+    dUdn = dot(G.n, ugrad(G.X(1,:),G.X(2,:))); 
+    dIdn = dot(G.n, Igrad(t(:,j), G.X));
+    integrand = sum((dUdn.*I(t(:,j),G.X) - u(G.X(1,:),G.X(2,:)).*dIdn).*(G.wts').*(G.spd),2); 
+    res(j) = integrand; 
 end
 
-fprintf("u(x) = %f\n", u(x(1),x(2)));
-fprintf("Estimate(x) = %f\n", result);
+
+
+uOfT=u(t(1,:),t(2,:));
+err = uOfT-res;
+
+figure;
+imagesc(tx,ty,log10(abs(err)));  caxis([-16 0]);  colorbar; hold on;
+plot(G.X(1,:), G.X(2,:), 'r-', 'markersize',8); ylim([-3,3]);
+

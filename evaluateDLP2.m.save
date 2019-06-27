@@ -1,0 +1,26 @@
+function result = evaluateDLP2d(sigma,G,X,Y)
+    %t are 2 dimensional target points
+    %G is a curve with embedded quadrature scheme
+    %sigma is a density function
+
+    n_srcs = length(G.X);
+   
+    result = 0*length(X);
+   
+    %loop over the target points
+    for j =1:1:length(X)
+        res = 0;
+   	 %loop over the quadrature points
+    	 for i=1:1:n_srcs
+    	     num = dot([G.n(i,1),G.n(i,2)], [X(j),Y(j)]-[G.X(i),G.Y(i)]); 
+    	     denom = sum(([X(j),Y(j)]-[G.X(i),G.Y(i)]).^2);
+    	     integrand = num/denom;
+  	     res = res + integrand*G.wts(i)/(2*pi)*sigma(G.Y(i));  %removing pi? 
+    	 end
+    	 result(j) = res;
+    end
+
+    for k=1:1:length(X)
+    	fprintf("u(%f,%f) = %f\n", X(k), Y(k), result(k));
+    end
+end

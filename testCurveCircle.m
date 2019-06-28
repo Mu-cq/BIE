@@ -19,8 +19,8 @@ quiver(C.X(1,:),C.X(2,:),C.n(1,:),C.n(2,:));     %(dy/dx = (dy/dtheta)/(dx/dthet
 %if F is holomorphic, then the integral or F around a closed boundary is 0.
 
 %strange: for even n, zero error after 2. For odd- fun oscillatory error 
-Ns = 20:10:100; 
-f =  @(z) cos(z); %Z is complex
+Ns = 20:10:500; 
+f =  @(z) sin(z); %Z is complex
 
 err = 0*length(Ns);
 integral = 0*length(Ns);
@@ -28,12 +28,12 @@ j = 1;
 for n=Ns
     d = curveCircle(3,n); %define a quadrature scheme with n points
     z = d.X(1,:) + 1i*d.X(2,:);    %convert to complex
-    integral(j) = sum(sin(z)'.*d.wts.*d.spd');   %compute the integration estimation
+    integral(j) = sum(f(z).*d.wts.*d.spd);   %compute the integration estimation
     err(j) = abs(integral(j)); %(estimate - 0);
     j = j + 1;
 end 
 
-alpha_obs = (log(err(1))-log(err(end)))/(Ns(end)-Ns(1));
+alpha_obs = (log(err(end))-log(err(1)))/(Ns(end)-Ns(1));
 figure;
 semilogy(Ns, err, 'r+-');
 hold on;

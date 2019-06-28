@@ -9,42 +9,39 @@ function C = curveCircle(r, N)
  
    %setting up "PTR" Quadrature 
 
-    pts = (2*pi*(1:N)'/N); %equally spaced pts on [0,2pi]
-    wts = 2*pi/(N)*ones(N,1); 
-  
-%     %setting up a "gauss-legendre" quadrature - NOT finished 
-%     C.p = 16; %points per panel
-%     C.n_panels = ceil(N/C.p);    
-% 
-%     %divide [0,2pi] into n_panels 
-% 
-%     [pts_g, wts_g] = gauss(C.p); %intially on interval[-1,1]
-%     pts_g = (pts_g+1)/2; %shift to [0,1]
-%     wts_g = wts_g/2;  %why? n_pts doesn't change 
-%     
-%     %wts repeat for each panel
-%     wts = repmat(wts_g', [1, C.n_panels]);
-%     
-%     %pts for each panel 
-%     C.left_endpts = [0:C.n_panels-1]*2*pi/C.n_panels;
-%     C.right_endpts = [1:C.n_panels]*2*pi/C.n_panels;
-%     
-%     %expand endspts to a vector containing per point displacement 
-%     C.ptsDisplacement_left = reshape(repmat(C.left_endpts',[1, C.p])', 1, []);
-%     C.ptsDisplacement_right = reshape(repmat(C.right_endpts',[1, C.p])', 1, []);  
-%     
-%     %repeat pts for each panel, but shift to start at left endpoint 
-%     C.pts_repeat = reshape(repmat(pts_g, [1, C.n_panels]), 1 , []);
-%     C.pts_shifted = C.pts_repeat + C.ptsDisplacement_left; 
-% 
-%     C.half_lengths = (C.ptsDisplacement_right-C.ptsDisplacement_left)/2;
-%     C.midpts = (C.ptsDisplacement_left+C.ptsDisplacement_right)/2; 
-% 
-%     C.s = (C.half_lengths.*C.pts_shifted + C.midpts);
+  %  pts = (2*pi*(1:N)'/N); %equally spaced pts on [0,2pi]
+  %  wts = 2*pi/(N)*ones(N,1); 
+  %  C.s = pts';
     
-    C.s = pts';
-    C.X = C.Z(C.s);
-    C.wts = wts;
+    %setting up a "gauss-legendre" quadrature - NOT finished 
+    C.p = 16; %points per panel
+    C.n_panels = ceil(N/C.p);    
+
+    %divide [0,2pi] into n_panels 
+
+    [pts_g, wts_g] = gauss(C.p); %intially on interval[-1,1]
+    pts_g = (pts_g+1)/2; %shift to [0,1]
+    wts_g = wts_g/C.n_panels;  
+    
+    %wts repeat for each panel
+    wts = repmat(wts_g', [1, C.n_panels]);
+    
+    %pts for each panel 
+    C.left_endpts = [0:C.n_panels-1]*2*pi/C.n_panels;
+    C.right_endpts = [1:C.n_panels]*2*pi/C.n_panels;
+    
+    %expand endspts to a vector containing per point displacement 
+    C.ptsDisplacement_left = reshape(repmat(C.left_endpts',[1, C.p])', 1, []);
+    C.ptsDisplacement_right = reshape(repmat(C.right_endpts',[1, C.p])', 1, []);  
+    
+    %repeat pts for each panel, but shift to start at left endpoint 
+    C.pts_repeat = reshape(repmat(pts_g, [1, C.n_panels]), 1 , []);
+    C.pts_shifted = C.pts_repeat + C.ptsDisplacement_left; 
+
+    C.s = C.pts_shifted;
+   
+    C.X = C.Z(C.s); 
+    C.wts = wts*pi;
     
     C.Zp_eval = C.Zp(C.s);
 

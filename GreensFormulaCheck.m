@@ -28,7 +28,7 @@ for j=1:1:length(t)
     
     dUdn = dot(G.n, ugrad(G.X(1,:),G.X(2,:))); 
     dIdn = dot(G.n, Igrad(t(:,j), G.X));
-    integrand = sum((dUdn.*I(t(:,j),G.X) - u(G.X(1,:),G.X(2,:)).*dIdn).*(G.wts').*(G.spd),2); 
+    integrand = sum((dUdn.*I(t(:,j),G.X) - u(G.X(1,:),G.X(2,:)).*dIdn).*(G.wts).*(G.spd),2); 
     res(j) = integrand; 
 end
 
@@ -46,14 +46,5 @@ plot(G.X(1,:), G.X(2,:), 'r-', 'markersize',16); ylim([-3,3]);
 title('Greens Formula log_{10} Error');  colorbar; xlabel('X'); ylabel('Y');
 
 
-
-function ans = Igrad(x,y)
-	 if(and(x(1) == y(1), x(2) == y(2)))
-	     ans = G.curr(x);
-	     fprintf("HERE");
-         else
-	     ans =  1/(2*pi)*(x-y)./sum((x-y).^2);
-	 end
-end		
 
 

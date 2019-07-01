@@ -21,27 +21,23 @@ function C = curveCircle(r, N)
 
     [pts_g, wts_g] = gauss(C.p); %intially on interval[-1,1]
     pts_g = (pts_g+1)/2; %shift to [0,1]
-    wts_g = wts_g/C.n_panels;  
+    wts_g = wts_g/2;
     
     %wts repeat for each panel
-    wts = repmat(wts_g', [1, C.n_panels]);
+    wts = repmat(wts_g*2*pi/C.n_panels, [C.n_panels,1]);
     
     %pts for each panel 
-    C.left_endpts = [0:C.n_panels-1]*2*pi/C.n_panels;
-    C.right_endpts = [1:C.n_panels]*2*pi/C.n_panels;
-    
-    %expand endspts to a vector containing per point displacement 
-    C.ptsDisplacement_left = reshape(repmat(C.left_endpts',[1, C.p])', 1, []);
-    C.ptsDisplacement_right = reshape(repmat(C.right_endpts',[1, C.p])', 1, []);  
-    
-    %repeat pts for each panel, but shift to start at left endpoint 
-    C.pts_repeat = reshape(repmat(pts_g, [1, C.n_panels]), 1 , []);
-    C.pts_shifted = C.pts_repeat + C.ptsDisplacement_left; 
+    C.endpts = [0:C.n_panels]*2*pi/C.n_panels;
 
-    C.s = C.pts_shifted;
+    pts = nan(N, 1);
+    for i=1:C.n_panels
+    	pts((i-1)*C.p + (1:C.p)) = C.endpts(i) + (C.endpts(i+1)-C.endpts(i))*pts_g;
+    end    
+
+    C.s = pts';
    
     C.X = C.Z(C.s); 
-    C.wts = wts*pi;
+    C.wts = wts';
     
     C.Zp_eval = C.Zp(C.s);
 
